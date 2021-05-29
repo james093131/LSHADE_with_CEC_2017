@@ -33,7 +33,7 @@ typedef vector<d3d> d4d;
 class LSHADE{
     public :
         d1d Run_Result;
-        d1d Run_Evaluation_Result;
+        d1d Run_NFE_result;
         double max;
         double min;
         double optimal;
@@ -41,15 +41,27 @@ class LSHADE{
     public : 
         void Run(int run ,int DIM,int Function,int MAX_NFE)
         {
-            srand( time(NULL) ); 
-            Initial(DIM,Function);
-
-            Evaluation(DIM,Function,Particle,Objective);
-            while(NFE < MAX_NFE)
+            int r = 0;
+            double START = clock();
+            RUN_INI(run,MAX_NFE);
+            while (r < run)
             {
-                Transition(DIM,Function);
-                Linear_Reduction( DIM, NFE,MAX_NFE);
+                srand( time(NULL) ); 
+                Initial(DIM,Function);
+
+                Evaluation(DIM,Function,Particle,Objective);
+                while(NFE < MAX_NFE)
+                {
+                    Transition(DIM,Function);
+                    Linear_Reduction( DIM, NFE,MAX_NFE);
+                }
+                Run_Result[r] = Current_best;
+
+                cout<<"RUN"<<r+1<<" : "<<Run_Result[r]<<endl;
+                r++;
             }
+            double END = clock();
+            OUTPUT(DIM,Function,MAX_NFE,run,START,END);
         }
     
 
@@ -64,6 +76,47 @@ class LSHADE{
         int H_Current;
         int NFE;
     private : 
+       void CEC_Classify(int F,double START,double END,double RUN_BEST,double RUN_AVG)
+        {
+            fstream file;           
+            string A = "LSHADE_2017_CEC_Classify.txt";
+            file.open(A,ios::app);
+            file<<F<<' '<<RUN_BEST<<' '<<RUN_AVG<<' '<<(END - START) / CLOCKS_PER_SEC<<endl;
+        }
+        void OUTPUT(int DIM,int Function,int MAX_NFE,int run,double START,double END)
+        {
+            for(int i=0;i<Run_NFE_result.size();i++)
+            {
+                Run_NFE_result[i] /= run;
+                cout<<i*500<<' '<<Run_NFE_result[i]-Function*100<<endl;
+            }
+            double BEST =DBL_MAX;
+            double AVG  = 0;
+            for(int i=0;i<run;i++)
+            {
+                AVG+= Run_Result[i];
+
+                if(Run_Result[i] < BEST)
+                    BEST = Run_Result[i];
+            }
+            AVG /= run;
+            AVG  -= Function*100;
+            BEST -= Function*100;
+            
+            cout<<"# CEC Testing Function : "<<Function<<endl;
+            cout<<"# Run : "<<run<<endl;
+            cout<<"# Evaluation : "<<MAX_NFE<<endl;
+            cout<<"# Dimension : "<<DIM<<endl;
+            cout<<"# Best Objective Value "<<endl<<BEST<<endl;
+            cout<<"# Average Objective Value "<<endl<<AVG<<endl;
+            cout<<"# Execution Time :"<<endl<<(END - START) / CLOCKS_PER_SEC<<"(s)"<<endl;
+            CEC_Classify(Function,START,END,BEST,AVG);
+        }
+        void RUN_INI(int run,int MAX_NFE)
+        {
+            Run_Result.resize(run,0);
+            Run_NFE_result.resize( MAX_NFE/500+1 ,0);
+        }
         void RANDOM_INI(int DIM)
         {
 
@@ -84,6 +137,7 @@ class LSHADE{
             max = 100.0;
             min = -100.0;
             optimal = 100*F;
+
             Archieve_MAX_SIZE = 2.6*DIM*18;
             Current_best = DBL_MAX;
             H_Current = 0;
@@ -132,15 +186,14 @@ class LSHADE{
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine g2(seed);
         std::cauchy_distribution<double> distribution(mean,0.1);
-        if(distribution(g2) > 1)
-            return 1;
-        
+       
         while( distribution(g2) <= 0 )
         {
             std::cauchy_distribution<double> distribution(mean,0.1);
         }
+        if(distribution(g2) > 1)
+            return 1;
         
-    
         return distribution(g2);
     }
     int FIND_Pbest()
@@ -211,7 +264,10 @@ class LSHADE{
 
 
             if( NFE % 500 == 0 )
-                cout<<"NFE: "<<NFE<<' '<<Current_best<<endl;
+            {
+                Run_NFE_result[NFE/500] += Current_best;
+                // cout<<"NFE: "<<NFE<<' '<<Current_best<<endl;
+            }
             
             NFE ++;
 
@@ -245,7 +301,7 @@ class LSHADE{
                 F_temp2 += (OBj[i]/OBj_SUM) * F[i] ;
             }
 
-
+            
             if(H_Table[H_Current][0]  != -1)
             {
                 if(CR_temp2 == 0)
@@ -259,6 +315,17 @@ class LSHADE{
 
             H_Table[H_Current][1] = (F_temp1/F_temp2);
 
+            if(H_Table[H_Current][0] > 1)   
+                H_Table[H_Current][0] = 1;
+            else if(H_Table[H_Current][0] < 0) 
+                  H_Table[H_Current][0] = 0;
+            
+            if(H_Table[H_Current][1] > 1)   
+                H_Table[H_Current][1] = 1;
+            else if(H_Table[H_Current][1] < 0) 
+                  H_Table[H_Current][1] = 0;
+
+            // cout<<"H"<<' '<<H_Table[H_Current][0]<<' '<<H_Table[H_Current][1]<<endl;
             H_Current ++;
             if(H_Current == H_Table.size())
                 H_Current = 0;
@@ -312,7 +379,7 @@ class LSHADE{
                 Objective[i] = CEC_Objective_Check(Objective[i]);
 
                 Archieve.push_back(Particle[i]);
-                // Archieve_MAX_SIZE = Particle.size()*2.6;
+                Archieve_MAX_SIZE = Particle.size()*2.6;
                 while(Archieve.size() >  Archieve_MAX_SIZE)
                 {
                     int r_DEL = rand() % ( ( Archieve.size() -1 ) - 0 + 1) + 0;
@@ -340,7 +407,7 @@ class LSHADE{
         int r2 = rand() % ( (Size + Archieve_size -1) - 0 + 1) + 0;
         while( r2 == ind || r2 ==r1 || r2 == Pbest )
         {
-            r2 = rand() % ( (Size -1) - 0 + 1) + 0;
+            r2 = rand() % ( (Size + Archieve_size -1) - 0 + 1) + 0;
         }
         double r2_bar;
        
@@ -358,9 +425,9 @@ class LSHADE{
             V[i] = Particle[ind][i] + F * (Particle[Pbest][i] - Particle[ind][i])\
                  + F * (Particle[r1][i] - r2_bar) ;
 
-            if (V[i] > max)        
+            if (V[i] >= max)        
                 V[i] = (Particle[ind][i]+max)/2;
-            else if (V[i] < min)
+            else if (V[i] <= min)
                 V[i] = (Particle[ind][i]+min)/2;
         }
         
@@ -370,7 +437,7 @@ class LSHADE{
     }
     void Linear_Reduction(int DIM,int NFE,int MAX_NFE)
     {
-        double N_min = 4.0;
+        double N_min = 5.0;
         double N_init = DIM*18.0;
 
         double NEW_N =  N_min - N_init/MAX_NFE *NFE + N_init;
@@ -383,21 +450,14 @@ class LSHADE{
                 DELETE_INDEX[i] = Rank_index[Rank_index.size()-i-1];
             }
             sort(DELETE_INDEX.begin(),DELETE_INDEX.end(),greater<int>());
-            for(int i= 0;i<Objective.size();i++)
-            {
-                cout<<i<<" "<<Objective[i]<<endl;
-            }
             for(int i=0;i<DELETE;i++)
             {
                 Particle.erase(Particle.begin()+ DELETE_INDEX[i] );
                 Objective.erase(Objective.begin() + DELETE_INDEX[i]);
                 Rank_index.erase(Rank_index.begin() + DELETE_INDEX[i]);
             }
-            for(int i= 0;i<Objective.size();i++)
-            {
-                cout<<i<<" "<<Objective[i]<<endl;
-            }
-                Rank();
+           
+            Rank();
         }
         
     }
