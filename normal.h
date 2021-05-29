@@ -107,7 +107,7 @@ class LSHADE{
 
             Objective.resize(DIM*18);
 
-            H_Table.resize(6*DIM,d1d(2,0.5));//0->CR 1->F 
+            H_Table.resize(6,d1d(2,0.5));//0->CR 1->F 
 
             RANDOM_INI(DIM);
         }
@@ -119,29 +119,29 @@ class LSHADE{
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine g1 (seed);            
         std::normal_distribution<double> distribution (mean,0.1);
-        while( distribution(g1) <= 0 )
-        {
-            
-                std::default_random_engine g1 (seed);      
-                std::normal_distribution<double> distribution (mean,0.1);    
-             
-        }
+      
         if(distribution(g1)>1)
             return 1;
-       
+        else if(distribution(g1)<0)
+            return 0;
         else
             return distribution(g1);
         }
     double Cauchy_Distribution(double mean)
     {
-        std::default_random_engine g2;
+        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::default_random_engine g2(seed);
         std::cauchy_distribution<double> distribution(mean,0.1);
         if(distribution(g2) > 1)
             return 1;
-        else if(distribution(g2) < 0)
-            return 0;
-        else
-            return distribution(g2);
+        
+        while( distribution(g2) <= 0 )
+        {
+            std::cauchy_distribution<double> distribution(mean,0.1);
+        }
+        
+    
+        return distribution(g2);
     }
     int FIND_Pbest()
     {
@@ -154,7 +154,7 @@ class LSHADE{
     {
         if(OBJ - optimal < 1e-8 )
             OBJ = optimal;
-
+        // OBJ -= optimal;
         return OBJ ;
     }
     d1d pairsort(d1d a) 
@@ -209,8 +209,9 @@ class LSHADE{
             if(OBJ[i] < Current_best)
                 Current_best = OBJ[i];
 
+
             if( NFE % 500 == 0 )
-                cout<<NFE<<' '<<Current_best<<endl;
+                cout<<"NFE: "<<NFE<<' '<<Current_best<<endl;
             
             NFE ++;
 
@@ -268,22 +269,26 @@ class LSHADE{
     {
         int P = Particle.size();
         int H_Size = H_Table.size();    
+        d1d tempV(DIM,0);
         d2d Particle_V(P,d1d(DIM,0));
         d1d Objective_V(P);
         d1d Table_CR,Table_F,S_CR,S_F,S_Obj;
-        double j_random = rand() % ( (DIM -1) - 0 + 1) + 0;
         for(int i=0;i<P;i++)
         {
+            double j_random = rand() % ( (DIM -1) - 0 + 1) + 0;
             int rH = rand() % ( (H_Size -1) - 0 + 1) + 0;
             double CR = Normal_Distribution(H_Table[rH][0]);
             double F  = Cauchy_Distribution(H_Table[rH][1]);
-            for(int j =0;j<DIM;j++)
+            
+            tempV = Generate_vector(i,DIM,P,F);
+            for(int j=0;j<DIM;j++)
             {
                 double r_cr = (1 - 0) * rand() / (RAND_MAX + 1.0) + 0;
 
+
                 if( r_cr <= CR || j_random == j )
                 {
-                    Particle_V[i][j] = Generate_vector(i,j,P,F);
+                    Particle_V[i][j] = tempV[j];
                 }
                 else{
                     Particle_V[i][j] = Particle[i][j];
@@ -307,6 +312,7 @@ class LSHADE{
                 Objective[i] = CEC_Objective_Check(Objective[i]);
 
                 Archieve.push_back(Particle[i]);
+                // Archieve_MAX_SIZE = Particle.size()*2.6;
                 while(Archieve.size() >  Archieve_MAX_SIZE)
                 {
                     int r_DEL = rand() % ( ( Archieve.size() -1 ) - 0 + 1) + 0;
@@ -319,10 +325,10 @@ class LSHADE{
         Rank();
 
     }
-    double Generate_vector(int ind,int DIM,int Size,double F) // pbest formula 
+    d1d Generate_vector(int ind,int DIM,int Size,double F) // pbest formula  which pop ,Dimension,Particle size,scaling factor
     {
         int Pbest = FIND_Pbest();
-
+        d1d V(DIM,0);
         int r1 = rand() % ( (Size -1) - 0 + 1) + 0;
         while( r1 == ind || r1 == Pbest)
         {
@@ -337,23 +343,29 @@ class LSHADE{
             r2 = rand() % ( (Size -1) - 0 + 1) + 0;
         }
         double r2_bar;
-        if (r2 < Size )
+       
+
+        for(int i=0;i<DIM;i++)
         {
-            r2_bar = Particle[r2][DIM];
+            if (r2 < Size )
+            {
+                r2_bar = Particle[r2][i];
+            }
+            else
+            {
+                r2_bar = Archieve[r2-Size][i]; 
+            }
+            V[i] = Particle[ind][i] + F * (Particle[Pbest][i] - Particle[ind][i])\
+                 + F * (Particle[r1][i] - r2_bar) ;
+
+            if (V[i] > max)        
+                V[i] = (Particle[ind][i]+max)/2;
+            else if (V[i] < min)
+                V[i] = (Particle[ind][i]+min)/2;
         }
-        else
-        {
-            r2_bar = Archieve[r2-Size][DIM]; 
-        }
+        
 
-
-        double V = Particle[ind][DIM] + F * (Particle[Pbest][DIM] - Particle[ind][DIM])\
-                 + F * (Particle[r1][DIM] - r2_bar) ;
-
-        if (V > max)        
-            V = (Particle[ind][DIM]+max)/2;
-        else if (V < min)
-            V = (Particle[ind][DIM]+min)/2;
+       
         return V;
     }
     void Linear_Reduction(int DIM,int NFE,int MAX_NFE)
@@ -371,12 +383,19 @@ class LSHADE{
                 DELETE_INDEX[i] = Rank_index[Rank_index.size()-i-1];
             }
             sort(DELETE_INDEX.begin(),DELETE_INDEX.end(),greater<int>());
-            
+            for(int i= 0;i<Objective.size();i++)
+            {
+                cout<<i<<" "<<Objective[i]<<endl;
+            }
             for(int i=0;i<DELETE;i++)
             {
                 Particle.erase(Particle.begin()+ DELETE_INDEX[i] );
                 Objective.erase(Objective.begin() + DELETE_INDEX[i]);
                 Rank_index.erase(Rank_index.begin() + DELETE_INDEX[i]);
+            }
+            for(int i= 0;i<Objective.size();i++)
+            {
+                cout<<i<<" "<<Objective[i]<<endl;
             }
                 Rank();
         }

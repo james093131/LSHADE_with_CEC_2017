@@ -228,6 +228,7 @@ void cec17_test_func(double *x, double *f, int nx, int mx,int func_num)
 		{
 		case 1:	
 			bent_cigar_func(&x[i*nx],&f[i],nx,OShift,M,1,1);
+			std::cout<<f[i]<<std::endl;
 			f[i]+=100.0;
 			break;
 		case 2:	
