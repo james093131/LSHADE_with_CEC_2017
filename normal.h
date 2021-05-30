@@ -379,7 +379,7 @@ class LSHADE{
                 Objective[i] = CEC_Objective_Check(Objective[i]);
 
                 Archieve.push_back(Particle[i]);
-                Archieve_MAX_SIZE = Particle.size()*2.6;
+                // Archieve_MAX_SIZE = Particle.size()*2.6;
                 while(Archieve.size() >  Archieve_MAX_SIZE)
                 {
                     int r_DEL = rand() % ( ( Archieve.size() -1 ) - 0 + 1) + 0;
