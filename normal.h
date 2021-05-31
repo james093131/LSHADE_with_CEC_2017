@@ -29,8 +29,263 @@ typedef vector<d1d> d2d;
 typedef vector<d2d> d3d;
 typedef vector<d3d> d4d;
 
+class Function{
+    public:
+    double ACKLEY_OBJECTIVE_VALUE(int DIM,d1d arr) //Calculate the objective value at ACKLEY Function 
+    {
+        double sum1= 0;
+        double sum2 = 0;
+        for(int i=0;i<DIM;i++)
+        {
 
-class LSHADE{
+            sum1 += pow(arr[i],2);
+            sum2 += cos(2*M_PI*arr[i]);
+
+        }
+        double F = -20*(exp((-0.2)*sqrt(sum1/DIM)))-exp(sum2/DIM)+20+exp(1);
+        return F;
+    }
+    double RASTRIGIN_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1= 0;
+            double sum2 = 0;
+            for(int i=0;i<DIM;i++)
+            {
+
+                sum1 += pow(arr[i],2);
+                sum2 += cos(2*M_PI*arr[i]);
+
+            }
+            double F =  sum1 - 10*sum2 +10*DIM;
+            return F;
+        }
+        
+    double ROSENBROCK_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1 = 0;
+            double sum2 = 0;
+            for(int i=1;i<DIM;i++)
+            {
+                sum1 += pow (arr[i] - pow(arr[i-1],2),2) ;
+                sum2 += pow(arr[i]-1 ,2);
+            // cout<<"S "<<sum1<<' '<<sum2<<endl;
+
+            }
+            double F =  100*sum1 +sum2;
+            return F;
+        }
+
+
+        double SPHERE_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1= 0;
+            for(int i=0;i<DIM;i++)
+            {
+
+                sum1 += pow(arr[i],2);
+
+
+            }
+            double F =  sum1;
+            return F;
+        }
+          
+        
+        double Michalewicz_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum = 0;
+            for(int i=0;i<DIM;i++)
+            {
+                double cal1 = 0;
+                double cal2 = 0;
+                cal1 = sin(2*M_PI*arr[i]);
+
+                double X = pow(arr[i],2);
+                cal2 = sin(i*X/M_PI);
+                cal2 = pow(cal2,20);
+
+                sum += cal1*cal2;
+            }
+            double F =  -sum;
+            return F;
+        }
+          
+
+         double Bent_Cigar_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1= 0;
+            double sum2 = 0;
+            sum1 = pow(arr[0],2);
+            for(int i=1;i<DIM;i++)
+            {
+
+                sum2 += pow(arr[i],2);
+
+            }
+            double F =  sum1 +1000000*sum2;
+            return F;
+        }
+
+        double Schaffer_F7_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double F = 0;
+            for(int i=0;i<DIM-1;i++)
+            {
+                double si = sqrt( pow(arr[i],2)+pow(arr[i+1],2) );
+                double F1 = sqrt(si)* (sin(50*pow(si,0.2))+1);
+                F += pow(F1/(DIM-1) , 2);
+
+            }
+            
+            return F;
+        }
+      
+        double Zakharov_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1 = 0;
+            double sum2 = 0;
+            for(int i=0;i<DIM;i++)
+            {
+                sum1 += pow(arr[i],2);
+                sum2 += 0.5*(i+1)*arr[i];
+
+            }
+            double F =  sum1 +pow(sum2,2)+pow(sum2,4);
+            return F;
+        }
+        double Griewank_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1 = 0;
+            double sum2 = 1;
+            for(int i=0;i<DIM;i++)
+            {
+                sum1 += pow(arr[i],2);
+                sum2 *= cos( (arr[i]/sqrt(i+1)) );
+
+            }
+            double F = 1 + sum1/4000 - sum2 ;
+            return F;
+        }
+      
+        // double SchafferN2_OBJECTIVE_VALUE(int DIM,d1d arr)
+        // {
+        //     double sum1 = 0;
+        //     double sum2 = 0;
+        //     for(int i=0;i<DIM;i++)
+        //     {
+        //         sum1 += pow(arr[i],2);
+        //         sum2 += pow(arr[i],2);
+
+        //     }
+        //     double F = 0.5+ sin(pow(sum1,2));
+        //     return F;
+        // }
+        double Schwefel_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1 = 0;
+            for(int i=0;i<DIM;i++)
+            {
+                double POS = arr[i];
+                if(POS < 0)
+                    POS = -POS;
+                sum1 += arr[i]*sin( sqrt(POS) ) ;
+
+            }
+            double F =  418.9829*DIM - sum1;
+            return F;
+        }
+          //  double BOHACHEVSKY_OBJECTIVE_VALUE(int DIM,d1d arr)
+        // {
+        //只有2D函式還沒寫好
+        //     double sum1 = 0;
+        //     double sum2 = 0;
+        //     for(int i=0;i<DIM;i++)
+        //     {
+        //         sum1 += arr[i]*sin( sqrt(arr[i]) ) ;
+
+        //     }
+        //     double F =  418.9829*DIM - sum1;
+        //     return F;
+        // }
+        double SUM_SQUARES_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1 = 0;
+            for(int i=0;i<DIM;i++)
+            {
+                sum1 += i*pow(arr[i],2);
+
+            }
+            double F = sum1;
+            return F;
+        }
+      
+        // double Booth_OBJECTIVE_VALUE(int DIM,d1d arr)
+        // {
+        //只有2D函式還沒寫好
+        //     double sum1 = 0;
+        //     for(int i=0;i<DIM;i++)
+        //     {
+        //         sum1 += i*pow(arr[i],2);
+
+        //     }
+        //     double F = sum1;
+        //     return F;
+        // }
+        double POWELL_OBJECTIVE_VALUE(int DIM,d1d arr)
+        {
+            double sum1 = 0;
+            for(int i=1;i<DIM/4;i++)
+            {
+                double temp = 0.0;
+                temp += pow( (arr[i*4-3]+10*arr[i*4-2]) ,2);
+                temp += 5*pow( (arr[i*4-1] - arr[i*4]) ,2);
+                double t3 = (arr[i*4-2] - 2*arr[i*4-1]);
+                temp += pow(t3,4);
+                double t4 = (arr[i*4-3] + 10*arr[i*4]);
+                temp += 10*pow(t4,4);
+                sum1 += temp;
+
+            }
+            double F = sum1;
+            return F;
+        }
+        
+        
+        double FUNCTION(int DIM,d1d arr,int F)
+        {
+            double R = 0.0;
+            if(F == 1)
+            {
+                R = ACKLEY_OBJECTIVE_VALUE(DIM,arr);
+            }
+            else if (F == 2)
+                R = RASTRIGIN_OBJECTIVE_VALUE(DIM,arr);
+           
+            else if (F == 3)
+                R = ROSENBROCK_OBJECTIVE_VALUE(DIM,arr);
+            else if (F == 4)
+                R = SPHERE_OBJECTIVE_VALUE(DIM,arr);
+            else if(F == 5)
+                R = Michalewicz_OBJECTIVE_VALUE(DIM,arr);
+            else if(F ==  6 )
+                R = Bent_Cigar_OBJECTIVE_VALUE(DIM,arr);
+             else if(F==  7)
+                R = Schaffer_F7_OBJECTIVE_VALUE(DIM,arr);
+            else if(F ==  8)
+                R = Zakharov_OBJECTIVE_VALUE(DIM,arr);
+            else if(F ==  9)
+                R = Griewank_OBJECTIVE_VALUE(DIM,arr);
+            else if(F ==  10)
+                R = Schwefel_OBJECTIVE_VALUE(DIM,arr);
+            else if(F ==  11)
+                R = SUM_SQUARES_OBJECTIVE_VALUE(DIM,arr);
+            else if(F ==  12)
+                R = POWELL_OBJECTIVE_VALUE(DIM,arr);
+            return R;
+        }    
+  
+};
+class LSHADE : public Function{
     public :
         d1d Run_Result;
         d1d Run_NFE_result;
@@ -76,19 +331,31 @@ class LSHADE{
         int H_Current;
         int NFE;
     private : 
-       void CEC_Classify(int F,double START,double END,double RUN_BEST,double RUN_AVG)
+       void Function_Classify(int F,double START,double END,double RUN_BEST,double RUN_AVG)
         {
             fstream file;           
-            string A = "LSHADE_2017_CEC_Classify.txt";
+            string A = "LSHADE_function_Classify.txt";
             file.open(A,ios::app);
             file<<F<<' '<<RUN_BEST<<' '<<RUN_AVG<<' '<<(END - START) / CLOCKS_PER_SEC<<endl;
+        }
+        void Run_Classify(int F,int run)
+        {
+            fstream file;           
+            string A = "LSHADE_"+to_string(F)+"_Run_Classify.txt";
+            file.open(A,ios::out);
+            for(int i=0;i<run;i++)
+            {
+                file<<Run_Result[i]<<' ';
+
+            }
+            file<<endl;
         }
         void OUTPUT(int DIM,int Function,int MAX_NFE,int run,double START,double END)
         {
             for(int i=0;i<Run_NFE_result.size();i++)
             {
                 Run_NFE_result[i] /= run;
-                cout<<i*500<<' '<<Run_NFE_result[i]-Function*100<<endl;
+                cout<<i*500<<' '<<Run_NFE_result[i]<<endl;
             }
             double BEST =DBL_MAX;
             double AVG  = 0;
@@ -100,8 +367,6 @@ class LSHADE{
                     BEST = Run_Result[i];
             }
             AVG /= run;
-            AVG  -= Function*100;
-            BEST -= Function*100;
             
             cout<<"# CEC Testing Function : "<<Function<<endl;
             cout<<"# Run : "<<run<<endl;
@@ -110,7 +375,8 @@ class LSHADE{
             cout<<"# Best Objective Value "<<endl<<BEST<<endl;
             cout<<"# Average Objective Value "<<endl<<AVG<<endl;
             cout<<"# Execution Time :"<<endl<<(END - START) / CLOCKS_PER_SEC<<"(s)"<<endl;
-            CEC_Classify(Function,START,END,BEST,AVG);
+            Function_Classify(Function,START,END,BEST,AVG);
+            Run_Classify(Function,run);
         }
         void RUN_INI(int run,int MAX_NFE)
         {
@@ -119,7 +385,6 @@ class LSHADE{
         }
         void RANDOM_INI(int DIM)
         {
-
             int SIZE = Particle.size();
             for(int i=0;i<SIZE;i++)
             {
@@ -134,9 +399,68 @@ class LSHADE{
         }
         void Initial(int DIM,int F)
         {
-            max = 100.0;
-            min = -100.0;
-            optimal = 100*F;
+            if(F==1)
+            {
+                max = 40.0;
+                min = -40.0;
+            }
+            else if(F==2)
+            {
+                max = 5.12;
+                min =-5.12;
+            }
+            else if(F==3)
+            {
+                max = 10;
+                min =-5;
+            }
+            else if(F==4)
+            {
+                max = M_PI;
+                min = 0 ;
+            }
+            else if(F==5)
+            {
+                max = 5.12;
+                min = -5.12 ;
+            }
+            else if(F==6)
+            {
+                max = 100;
+                min = -100;
+            }
+            else if(F==7)
+            {
+                max = 100;
+                min = -100;
+            }
+            else if(F==8)
+            {
+                max = 100;
+                min = -100;
+            }
+            else if(F==9)
+            {
+                max = 600.0;
+                min = -600.0;
+            }
+            else if(F==10)
+            {
+                max = 500.0;
+                min = -500.0;
+
+            }
+            else if(F ==11)
+            {
+                max = 10.0;
+                min = -10.0;
+            }
+            else if(F ==12)
+            {
+                max = 5.0;
+                min = -4.0;
+            }
+            // optimal = 100*F;
 
             Archieve_MAX_SIZE = 2.6*DIM*18;
             Current_best = DBL_MAX;
@@ -252,11 +576,11 @@ class LSHADE{
             //     cout<<arr[i][j]<<' ';
             // }
             // cout<<OBJ[i]<<endl;
-            cec17_test_func(&arr[i][0],&OBJ[i],DIM,1,Function);
+            // cec17_test_func(&arr[i][0],&OBJ[i],DIM,1,Function);
                 // cout<<"A"<<endl;
+            
 
-
-            OBJ[i] = CEC_Objective_Check( OBJ[i] );
+            OBJ[i] = Function::FUNCTION( DIM,arr[i],Function);
             
 
             if(OBJ[i] < Current_best)
@@ -376,7 +700,7 @@ class LSHADE{
                 Particle[i].assign(Particle_V[i].begin(), Particle_V[i].end());
                 Objective[i] = Objective_V[i];
                 
-                Objective[i] = CEC_Objective_Check(Objective[i]);
+                // Objective[i] = CEC_Objective_Check(Objective[i]);
 
                 Archieve.push_back(Particle[i]);
                 // Archieve_MAX_SIZE = Particle.size()*2.6;
