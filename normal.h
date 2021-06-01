@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <random>
 #include <chrono>
-#include "cec17_test_func.cc"
+#include "TestingFunction.h"
 
 using namespace std;
 
@@ -29,263 +29,8 @@ typedef vector<d1d> d2d;
 typedef vector<d2d> d3d;
 typedef vector<d3d> d4d;
 
-class Function{
-    public:
-    double ACKLEY_OBJECTIVE_VALUE(int DIM,d1d arr) //Calculate the objective value at ACKLEY Function 
-    {
-        double sum1= 0;
-        double sum2 = 0;
-        for(int i=0;i<DIM;i++)
-        {
-
-            sum1 += pow(arr[i],2);
-            sum2 += cos(2*M_PI*arr[i]);
-
-        }
-        double F = -20*(exp((-0.2)*sqrt(sum1/DIM)))-exp(sum2/DIM)+20+exp(1);
-        return F;
-    }
-    double RASTRIGIN_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1= 0;
-            double sum2 = 0;
-            for(int i=0;i<DIM;i++)
-            {
-
-                sum1 += pow(arr[i],2);
-                sum2 += cos(2*M_PI*arr[i]);
-
-            }
-            double F =  sum1 - 10*sum2 +10*DIM;
-            return F;
-        }
-        
-    double ROSENBROCK_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1 = 0;
-            double sum2 = 0;
-            for(int i=1;i<DIM;i++)
-            {
-                sum1 += pow (arr[i] - pow(arr[i-1],2),2) ;
-                sum2 += pow(arr[i]-1 ,2);
-            // cout<<"S "<<sum1<<' '<<sum2<<endl;
-
-            }
-            double F =  100*sum1 +sum2;
-            return F;
-        }
-
-
-        double SPHERE_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1= 0;
-            for(int i=0;i<DIM;i++)
-            {
-
-                sum1 += pow(arr[i],2);
-
-
-            }
-            double F =  sum1;
-            return F;
-        }
-          
-        
-        double Michalewicz_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum = 0;
-            for(int i=0;i<DIM;i++)
-            {
-                double cal1 = 0;
-                double cal2 = 0;
-                cal1 = sin(2*M_PI*arr[i]);
-
-                double X = pow(arr[i],2);
-                cal2 = sin(i*X/M_PI);
-                cal2 = pow(cal2,20);
-
-                sum += cal1*cal2;
-            }
-            double F =  -sum;
-            return F;
-        }
-          
-
-         double Bent_Cigar_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1= 0;
-            double sum2 = 0;
-            sum1 = pow(arr[0],2);
-            for(int i=1;i<DIM;i++)
-            {
-
-                sum2 += pow(arr[i],2);
-
-            }
-            double F =  sum1 +1000000*sum2;
-            return F;
-        }
-
-        double Schaffer_F7_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double F = 0;
-            for(int i=0;i<DIM-1;i++)
-            {
-                double si = sqrt( pow(arr[i],2)+pow(arr[i+1],2) );
-                double F1 = sqrt(si)* (sin(50*pow(si,0.2))+1);
-                F += pow(F1/(DIM-1) , 2);
-
-            }
-            
-            return F;
-        }
-      
-        double Zakharov_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1 = 0;
-            double sum2 = 0;
-            for(int i=0;i<DIM;i++)
-            {
-                sum1 += pow(arr[i],2);
-                sum2 += 0.5*(i+1)*arr[i];
-
-            }
-            double F =  sum1 +pow(sum2,2)+pow(sum2,4);
-            return F;
-        }
-        double Griewank_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1 = 0;
-            double sum2 = 1;
-            for(int i=0;i<DIM;i++)
-            {
-                sum1 += pow(arr[i],2);
-                sum2 *= cos( (arr[i]/sqrt(i+1)) );
-
-            }
-            double F = 1 + sum1/4000 - sum2 ;
-            return F;
-        }
-      
-        // double SchafferN2_OBJECTIVE_VALUE(int DIM,d1d arr)
-        // {
-        //     double sum1 = 0;
-        //     double sum2 = 0;
-        //     for(int i=0;i<DIM;i++)
-        //     {
-        //         sum1 += pow(arr[i],2);
-        //         sum2 += pow(arr[i],2);
-
-        //     }
-        //     double F = 0.5+ sin(pow(sum1,2));
-        //     return F;
-        // }
-        double Schwefel_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1 = 0;
-            for(int i=0;i<DIM;i++)
-            {
-                double POS = arr[i];
-                if(POS < 0)
-                    POS = -POS;
-                sum1 += arr[i]*sin( sqrt(POS) ) ;
-
-            }
-            double F =  418.9829*DIM - sum1;
-            return F;
-        }
-          //  double BOHACHEVSKY_OBJECTIVE_VALUE(int DIM,d1d arr)
-        // {
-        //只有2D函式還沒寫好
-        //     double sum1 = 0;
-        //     double sum2 = 0;
-        //     for(int i=0;i<DIM;i++)
-        //     {
-        //         sum1 += arr[i]*sin( sqrt(arr[i]) ) ;
-
-        //     }
-        //     double F =  418.9829*DIM - sum1;
-        //     return F;
-        // }
-        double SUM_SQUARES_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1 = 0;
-            for(int i=0;i<DIM;i++)
-            {
-                sum1 += i*pow(arr[i],2);
-
-            }
-            double F = sum1;
-            return F;
-        }
-      
-        // double Booth_OBJECTIVE_VALUE(int DIM,d1d arr)
-        // {
-        //只有2D函式還沒寫好
-        //     double sum1 = 0;
-        //     for(int i=0;i<DIM;i++)
-        //     {
-        //         sum1 += i*pow(arr[i],2);
-
-        //     }
-        //     double F = sum1;
-        //     return F;
-        // }
-        double POWELL_OBJECTIVE_VALUE(int DIM,d1d arr)
-        {
-            double sum1 = 0;
-            for(int i=1;i<DIM/4;i++)
-            {
-                double temp = 0.0;
-                temp += pow( (arr[i*4-3]+10*arr[i*4-2]) ,2);
-                temp += 5*pow( (arr[i*4-1] - arr[i*4]) ,2);
-                double t3 = (arr[i*4-2] - 2*arr[i*4-1]);
-                temp += pow(t3,4);
-                double t4 = (arr[i*4-3] + 10*arr[i*4]);
-                temp += 10*pow(t4,4);
-                sum1 += temp;
-
-            }
-            double F = sum1;
-            return F;
-        }
-        
-        
-        double FUNCTION(int DIM,d1d arr,int F)
-        {
-            double R = 0.0;
-            if(F == 1)
-            {
-                R = ACKLEY_OBJECTIVE_VALUE(DIM,arr);
-            }
-            else if (F == 2)
-                R = RASTRIGIN_OBJECTIVE_VALUE(DIM,arr);
-           
-            else if (F == 3)
-                R = ROSENBROCK_OBJECTIVE_VALUE(DIM,arr);
-            else if (F == 4)
-                R = SPHERE_OBJECTIVE_VALUE(DIM,arr);
-            else if(F == 5)
-                R = Michalewicz_OBJECTIVE_VALUE(DIM,arr);
-            else if(F ==  6 )
-                R = Bent_Cigar_OBJECTIVE_VALUE(DIM,arr);
-             else if(F==  7)
-                R = Schaffer_F7_OBJECTIVE_VALUE(DIM,arr);
-            else if(F ==  8)
-                R = Zakharov_OBJECTIVE_VALUE(DIM,arr);
-            else if(F ==  9)
-                R = Griewank_OBJECTIVE_VALUE(DIM,arr);
-            else if(F ==  10)
-                R = Schwefel_OBJECTIVE_VALUE(DIM,arr);
-            else if(F ==  11)
-                R = SUM_SQUARES_OBJECTIVE_VALUE(DIM,arr);
-            else if(F ==  12)
-                R = POWELL_OBJECTIVE_VALUE(DIM,arr);
-            return R;
-        }    
-  
-};
-class LSHADE : public Function{
+ 
+class LSHADE{
     public :
         d1d Run_Result;
         d1d Run_NFE_result;
@@ -570,18 +315,13 @@ class LSHADE : public Function{
         int P = arr.size();
         for(int i=0;i<P;i++)
         {
-            // cout<<"B"<<endl;
-            // for(int j=0;j<DIM;j++)
-            // {
-            //     cout<<arr[i][j]<<' ';
-            // }
-            // cout<<OBJ[i]<<endl;
-            // cec17_test_func(&arr[i][0],&OBJ[i],DIM,1,Function);
-                // cout<<"A"<<endl;
+           
             
 
-            OBJ[i] = Function::FUNCTION( DIM,arr[i],Function);
+            // OBJ[i] = Function::FUNCTION( DIM,arr[i],Function);
             
+            Testing_Function(&arr[i][0],&OBJ[i],DIM,1,Function);
+
 
             if(OBJ[i] < Current_best)
                 Current_best = OBJ[i];

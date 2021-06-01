@@ -3,7 +3,7 @@
 
 
  j=1
-   for (( j; j<7; j=j+1 ))
+   for (( j; j<12; j=j+1 ))
    do
         echo $j
         ./LSHADE 30 100 $j 1000000 >> SomeFunction/100D/LSHADE_CEC_${j}.txt
