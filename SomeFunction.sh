@@ -2,12 +2,12 @@
 
 
 
-#  j=1
-#    for (( j; j<13; j=j+1 ))
-#    do
-#         echo $j
-#         ./SHADE 30 100 $j 1000000 >> SomeFunction/100D/LSHADE_CEC_${j}.txt
-#    done
+ j=1
+   for (( j; j<7; j=j+1 ))
+   do
+        echo $j
+        ./LSHADE 30 100 $j 1000000 >> SomeFunction/100D/LSHADE_CEC_${j}.txt
+   done
 
 #  j=1
 #    for (( j; j<13; j=j+1 ))
@@ -24,9 +24,9 @@
 #         ./LSHADE 30 50 $j 500000 >> SomeFunction/50D/LSHADE_CEC_${j}.txt
 #      done
 
-j=1
-   for (( j; j<13; j=j+1 ))
-   do
-        echo $j
-        ./LSHADE 30 100 $j 1000000 >> SomeFunction/100D/LSHADE_CEC_${j}.txt
-   done
+# j=1
+#    for (( j; j<13; j=j+1 ))
+#    do
+#         echo $j
+#         ./LSHADE 30 100 $j 1000000 >> SomeFunction/100D/LSHADE_CEC_${j}.txt
+#    done
