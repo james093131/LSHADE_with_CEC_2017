@@ -76,10 +76,10 @@ class LSHADE{
         int H_Current;
         int NFE;
     private : 
-       void CEC_Classify(int F,double START,double END,double RUN_BEST,double RUN_AVG)
+       void CEC_Classify(int F,double START,double END,double RUN_BEST,double RUN_AVG,int DIM)
         {
             fstream file;           
-            string A = "LSHADE_2017_CEC_Classify.txt";
+            string A = "LSHADE_2017_CEC_Classify"+to_string(DIM)+".txt";
             file.open(A,ios::app);
             file<<F<<' '<<RUN_BEST<<' '<<RUN_AVG<<' '<<(END - START) / CLOCKS_PER_SEC<<endl;
         }
@@ -110,7 +110,7 @@ class LSHADE{
             cout<<"# Best Objective Value "<<endl<<BEST<<endl;
             cout<<"# Average Objective Value "<<endl<<AVG<<endl;
             cout<<"# Execution Time :"<<endl<<(END - START) / CLOCKS_PER_SEC<<"(s)"<<endl;
-            CEC_Classify(Function,START,END,BEST,AVG);
+            CEC_Classify(Function,START,END,BEST,AVG,DIM);
         }
         void RUN_INI(int run,int MAX_NFE)
         {
