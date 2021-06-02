@@ -90,10 +90,9 @@ class LSHADE{
             file.open(A,ios::out);
             for(int i=0;i<run;i++)
             {
-                file<<Run_Result[i]<<' ';
+                file<<Run_Result[i]<<endl;
 
             }
-            file<<endl;
         }
         void OUTPUT(int DIM,int Function,int MAX_NFE,int run,double START,double END)
         {
