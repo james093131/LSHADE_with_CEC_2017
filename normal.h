@@ -83,13 +83,25 @@ class LSHADE{
             file.open(A,ios::app);
             file<<F<<' '<<RUN_BEST<<' '<<RUN_AVG<<' '<<(END - START) / CLOCKS_PER_SEC<<endl;
         }
+        void Run_Classify(int F,int run,int DIM)
+        {
+            fstream file; 
+            string DIR = "/home/ailab/Downloads/LSHADE_with_CEC_2017/CEC_2017/RUN_RESULT/";        
+            string A = DIR+to_string(DIM)+"D/"+to_string(F)+"_Run_Classify.txt";
+            file.open(A,ios::out);
+            for(int i=0;i<run;i++)
+            {
+                file<<Run_Result[i]-F*100<<endl;
+
+            }
+        }
         void OUTPUT(int DIM,int Function,int MAX_NFE,int run,double START,double END)
         {
-            for(int i=0;i<Run_NFE_result.size();i++)
-            {
-                Run_NFE_result[i] /= run;
-                cout<<i*500<<' '<<Run_NFE_result[i]-Function*100<<endl;
-            }
+            // for(int i=0;i<Run_NFE_result.size();i++)
+            // {
+            //     Run_NFE_result[i] /= run;
+            //     cout<<i*500<<' '<<Run_NFE_result[i]-Function*100<<endl;
+            // }
             double BEST =DBL_MAX;
             double AVG  = 0;
             for(int i=0;i<run;i++)
@@ -111,6 +123,7 @@ class LSHADE{
             cout<<"# Average Objective Value "<<endl<<AVG<<endl;
             cout<<"# Execution Time :"<<endl<<(END - START) / CLOCKS_PER_SEC<<"(s)"<<endl;
             CEC_Classify(Function,START,END,BEST,AVG,DIM);
+            Run_Classify(Function,run,DIM);
         }
         void RUN_INI(int run,int MAX_NFE)
         {
